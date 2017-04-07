@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Tastr.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using MySQL.Data.EntityFrameworkCore.Extensions;
 
 namespace Tastr.Api
 {
@@ -28,6 +27,13 @@ namespace Tastr.Api
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
+            
+            var connection = Configuration["Data:DefaultConnection:ConnectionString"];
+            var optionsBuilder = new DbContextOptionsBuilder<TastrContext>();
+            optionsBuilder.UseMySQL(connection);
+            DbContext dbContext = new TastrContext(optionsBuilder.Options);
+            dbContext.Database.EnsureCreated();
+            services.AddDbContext<TastrContext>(options => options.UseMySQL(connection));
             services.AddMvc();
         }
 

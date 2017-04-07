@@ -1,4 +1,4 @@
-namespace Tastr.Domain
+namespace Tastr.Data
 {
     public class ItemExperience
     {
