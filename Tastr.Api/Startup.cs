@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using MySQL.Data.EntityFrameworkCore.Extensions;
+using System.Collections.Generic;
 
 namespace Tastr.Api
 {
@@ -27,12 +28,7 @@ namespace Tastr.Api
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            
             var connection = Configuration["Data:DefaultConnection:ConnectionString"];
-            var optionsBuilder = new DbContextOptionsBuilder<TastrContext>();
-            optionsBuilder.UseMySQL(connection);
-            DbContext dbContext = new TastrContext(optionsBuilder.Options);
-            dbContext.Database.EnsureCreated();
             services.AddDbContext<TastrContext>(options => options.UseMySQL(connection));
             services.AddMvc();
         }
@@ -44,6 +40,32 @@ namespace Tastr.Api
             loggerFactory.AddDebug();
 
             app.UseMvc();
+            Seed(app);
+        }
+
+        private void Seed(IApplicationBuilder app) {
+            var context = app.ApplicationServices.GetRequiredService<TastrContext>();
+            context.Database.EnsureCreated();
+            var user1 = new User
+                    {                        
+                        Email = "russ4stall@gmail.com",
+                        FirstName = "Russ",
+                        LastName = "Forstall"
+                    };
+
+
+            var session1 = new Session() {
+                Title = "Whiskey Tasting",
+                Description = "",
+                Location = "My House",
+                DateTime = new System.DateTime()                
+            };
+            var sessions = new List<Session>();
+            
+            sessions.Add(session1);
+            user1.Sessions = sessions;
+            context.Users.Add(user1);
+            context.SaveChanges();
         }
     }
 }
