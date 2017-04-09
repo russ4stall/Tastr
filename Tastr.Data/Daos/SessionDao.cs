@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Tastr.Data
 {
@@ -13,26 +15,32 @@ namespace Tastr.Data
             _context = context;
         }
 
-        public void Add(Session session)
+        public Session Add(Session session)
         {
             _context.Sessions.Add(session);
             _context.SaveChanges();
+            return session;
         }
 
-        public IEnumerable<Session> GetAll()
+        public IQueryable<Session> FindBy(Expression<Func<Session, bool>> predicate)
         {
-            return _context.Sessions.ToList();
+            IQueryable<Session> query = _context.Set<Session>().Where(predicate);
+            return query;
         }
 
-        public Session Find(int key)
+        public IQueryable<Session> GetAll()
         {
-            return _context.Sessions.FirstOrDefault(t => t.Id == key);
-            throw new NotImplementedException();
+            return _context.Sessions;
         }
 
-        public void Remove(int key)
+        public Session Find(int id)
         {
-            var entity = _context.Sessions.First(t => t.Id == key);
+            return _context.Sessions.FirstOrDefault(t => t.Id == id);
+        }
+
+        public void Remove(int id)
+        {
+            var entity = _context.Sessions.First(t => t.Id == id);
             _context.Sessions.Remove(entity);
             _context.SaveChanges();
         }
@@ -41,6 +49,17 @@ namespace Tastr.Data
         {
             _context.Sessions.Update(session);
             _context.SaveChanges();
+        }
+
+        public IEnumerable<Item> GetSessionItems(int sessionId)
+        {
+            var session = _context.Sessions
+                                    .Include(x => x.SessionItems)
+                                        .ThenInclude(x => x.Item)
+                                        .FirstOrDefault(x => x.Id == sessionId);
+
+            var items = session.SessionItems.Select(x => x.Item);
+            return items;
         }
     }
 }

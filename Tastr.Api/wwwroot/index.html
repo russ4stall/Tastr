@@ -1,0 +1,184 @@
+<html>
+
+<head>
+	<script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.js"></script>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
+	 crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+	 crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+
+	<style>
+		body {
+			min-height: 75rem;
+			padding-top: 4.5rem;
+		}
+
+		input.error {
+			border-color: red;
+		}
+
+		label.error {
+			color: red;
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+		<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse"
+		 aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+		<a class="navbar-brand" href="#">Fixed navbar</a>
+		<div class="collapse navbar-collapse" id="navbarCollapse">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">Link</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link disabled" href="#">Disabled</a>
+				</li>
+			</ul>
+			<form class="form-inline mt-2 mt-md-0">
+				<input class="form-control mr-sm-2" type="text" placeholder="Search">
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+			</form>
+		</div>
+	</nav>
+
+	<div class="container">
+		<div class="jumbotron">
+			<h1>Navbar example</h1>
+			<p class="lead">This example is a quick exercise to illustrate how fixed to top navbar works. As you scroll, it will remain fixed to the
+				top of your browser's viewport.</p>
+			<a class="btn btn-lg btn-primary" href="../../components/navbar/" role="button">View navbar docs &raquo;</a>
+		</div>
+
+
+		<div class="row mb-3">
+			<div class="col-md-4 mb-3">
+				<div class="card card-outline-success">
+					<div class="card-header card-inverse card-success">
+						<h3>Add A Peep</h3>
+					</div>
+					<div class="card-block">
+						<p class="card-text text-center">
+							<form id="PeepForm"  data-bind="submit: addPeep" novalidate>
+							<!--<form id="PeepForm" novalidate>-->
+								<div class="form-group row">
+									<div class="col-12">
+										<input class="form-control" id="NewFirstName" name="newFirstName" type="text" placeholder="First Name" data-bind="value: newFirstName" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<div class="col-12">
+										<input class="form-control" id="NewLastName" name="newLastName" type="text" placeholder="Last Name" data-bind="value: newLastName" required>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<button class="btn btn-block btn-secondary" type="button" data-bind="click: clearPeep">Clear</button>
+									</div>
+									<div class="col-6">
+										<button class="btn btn-block btn-success" type="submit">Add Peep</button>
+										<!--<button class="btn btn-block btn-success" data-bind="click: addPeep">Add Peep</button>-->
+									</div>
+								</div>
+							</form>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row mb-3" data-bind="foreach: peeps">
+			<div class="col-md-6 mb-3">
+				<div class="card card-outline-primary">
+					<div class="card-header card-outline-primary">
+						<h3 data-bind="text: fullName"></h3>
+					</div>
+					<div class="card-block">
+						<p class="card-text">
+							<div class="form-group row">
+								<label class="col-4 col-form-label">First Name</label>
+								<div class="col-8">
+									<p class="form-control-static" data-bind="text: firstName"></p>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-4 col-form-label">Last Name</label>
+								<div class="col-8">
+									<p class="form-control-static" data-bind="text: lastName"></p>
+								</div>
+							</div>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3">
+				<button class="btn btn-success" data-bind="click: printData">Print Data</button>
+			</div>
+		</div>
+	</div>
+
+
+
+	<script>
+		console.log("hey");
+
+		function Peep(firstName, lastName) {
+			var self = this;
+			self.firstName = firstName;
+			self.lastName = lastName;
+			self.fullName = self.firstName + " " + self.lastName;
+		}
+
+		var myViewModel = {
+			peeps: ko.observableArray([]),
+			newFirstName: ko.observable(""),
+			newLastName: ko.observable(""),
+			clearPeep: function () {
+				this.newFirstName("");
+				this.newLastName("");
+				var validator = $("#PeepForm").validate();
+				validator.resetForm();
+			},
+			addPeep: function (formElement) {
+				var form = $(formElement);
+
+				console.log(form);	
+
+				var validator = form.validate();
+				console.log(validator);	
+
+				if (form.valid()) {
+					this.peeps.push(new Peep(this.newFirstName(), this.newLastName()));
+					this.newFirstName("");
+					this.newLastName("");
+					validator.destroy();
+					$('#NewFirstName').focus();
+				}
+			},
+			printData: function () {
+				console.log("Peeps:", this.peeps());				
+			}
+		}
+
+
+		$(function () {
+			ko.applyBindings(myViewModel);
+		});
+	</script>
+</body>
+
+</html>

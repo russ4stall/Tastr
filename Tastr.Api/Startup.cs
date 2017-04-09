@@ -1,13 +1,12 @@
 ﻿using Tastr.Data;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 using MySQL.Data.EntityFrameworkCore.Extensions;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Tastr.Api
 {
@@ -33,6 +32,7 @@ namespace Tastr.Api
             services.AddDbContext<TastrContext>(options => options.UseMySQL(connection));
             services.AddMvc();
             services.AddScoped<ISessionDao, SessionDao>();
+            services.AddScoped<IItemDao, ItemDao>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,6 +42,7 @@ namespace Tastr.Api
             loggerFactory.AddDebug();
 
             app.UseMvc();
+            app.UseStaticFiles();
             //Seed(app);
         }
 
@@ -57,6 +58,23 @@ namespace Tastr.Api
                 Name = "Jack Daniels",
                 Description = "Tennessee Bourbon. Whiskey made..."
             };
+
+            context.Items.Add(new Item() {
+                Name = "Evan Williams",
+                Description = "Got dat green label. Cheap but gets the job done."
+            });
+            context.Items.Add(new Item() {
+                Name = "Crown Royal",
+                Description = "Canada's finest. Comes in a fancy pouch."
+            });
+            context.Items.Add(new Item() {
+                Name = "Fireball",
+                Description = "This is straight up candy."
+            });
+            context.Items.Add(new Item() {
+                Name = "Wild Turkey",
+                Description = "Mmm mmm mmm mm good."
+            });
 
             // Create users
             var user1 = new User
@@ -85,8 +103,6 @@ namespace Tastr.Api
 
             user1.Sessions = sessions;
 
-
-
             // Create item experiences
             var exp1 = new ItemExperience
             {
@@ -99,10 +115,7 @@ namespace Tastr.Api
             experiences.Add(exp1);
 
             user1.ItemExperiences = experiences;
-
-
-
-            //context.Items.Add(jd);
+            
             context.Users.Add(user1);
             context.SaveChanges();
         }

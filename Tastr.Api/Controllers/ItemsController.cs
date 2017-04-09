@@ -6,37 +6,58 @@ using Tastr.Data;
 namespace Tastr.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class ItemsController : BaseController
+    public class ItemsController : Controller
     {
-        public ItemsController(TastrContext context) : base(context) {}
+        private IItemDao _itemDao;
+        public ItemsController(IItemDao itemDao) {
+            _itemDao = itemDao;
+        }
 
         [HttpGet]
         public IEnumerable<Item> Get()
         {
-            var items = Context.Items;    
+            var items = _itemDao.GetAll();            
             return items ;
         }
 
         [HttpGet("{id}")]
-        public Item Get(int id)
+        public IActionResult Get(int id)
         {
-            var item = Context.Items.FirstOrDefault(i => i.Id == id);    
-            return item ;
+            var item = _itemDao.Find(id);
+            if (item == null) {
+                return NotFound();
+            }
+            return Ok(item);
         }
 
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody]Item item)
         {
+            _itemDao.Add(item);
+            return new CreatedResult($"/api/items/{item.Id}", item);
         }
 
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public IActionResult Put(int id, [FromBody]Item item)
         {
+            var toUpdate = _itemDao.Find(id);
+            if (toUpdate == null) {
+                _itemDao.Add(item);
+                return new CreatedResult($"/api/items/{item.Id}", item);
+            }
+
+            toUpdate.Name = item.Name;
+            toUpdate.Description = item.Description;
+
+            _itemDao.Update(toUpdate);
+            return new OkResult();
         }
 
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            _itemDao.Remove(id);
+            return new NoContentResult();
         }
     }
 }

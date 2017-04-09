@@ -2,12 +2,8 @@ using System.Collections.Generic;
 
 namespace Tastr.Data 
 {
-    public interface ISessionDao
+    public interface ISessionDao : IGenericRepository<Session>
     {
-        void Add(Session session);
-        IEnumerable<Session> GetAll();
-        Session Find(int id);
-        void Remove(int id);
-        void Update(Session session);
+        IEnumerable<Item> GetSessionItems(int sessionId);
     }
 }

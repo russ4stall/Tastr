@@ -36,7 +36,6 @@ namespace Tastr.Api.Controllers
         [HttpPut("{id}")]
         public ActionResult Put(int id, [FromBody]Session session)
         {
-
             var toUpdate = _sessionDao.Find(id);
             if (toUpdate == null) {
                 _sessionDao.Add(session);
